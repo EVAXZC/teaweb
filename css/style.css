@@ -1,0 +1,257 @@
+:root {
+  --tea-green: #5a9367;
+  --tea-green-dark: #3f7050;
+  --ink: #2c3a2e;
+  --paper: #f4f7ef;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #e7efdd;
+  color: var(--ink);
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------- 导览图 ---------- */
+#map-stage {
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e7efdd;
+}
+
+.map-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: auto;
+  line-height: 0;
+}
+
+#map-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ---------- 地图热点 ---------- */
+.hotspots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* 仅标记本身可点击 */
+}
+
+.hotspot {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px; /* 以坐标为圆心 */
+  border-radius: 50%;
+  background: rgba(90, 147, 103, 0.85);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 脉冲提示环 */
+.hotspot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(90, 147, 103, 0.6);
+  animation: pulse 2s ease-out infinite;
+}
+.hotspot:active { background: var(--tea-green-dark); }
+
+@keyframes pulse {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@media (max-width: 600px) {
+  .hotspot { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
+}
+
+.hint {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  background: rgba(63, 112, 80, 0.92);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 16px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.4s ease;
+}
+.hint.fade { opacity: 0; pointer-events: none; }
+
+/* ---------- 弹窗 ---------- */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 22, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fade-in 0.25s ease;
+}
+.popup-overlay[hidden] { display: none; }
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.popup {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  background: var(--paper);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  animation: pop-in 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* 图片画廊 —— 横向滑动 */
+.popup-gallery {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  background: #d9e6cb;
+}
+.popup-gallery img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: clamp(180px, 52vw, 260px);
+  object-fit: cover;
+  scroll-snap-align: start;
+  display: block;
+}
+
+.popup-body {
+  padding: 18px 22px 6px;
+  overflow-y: auto;
+}
+.popup-title {
+  margin: 0 0 12px;
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--tea-green-dark);
+}
+.popup-intro p {
+  margin: 0 0 12px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: #41513f;
+}
+
+.popup-view-map {
+  margin: 8px 18px 18px;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: var(--tea-green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.popup-view-map:active { background: var(--tea-green-dark); }
+
+/* 缺省页 —— spot 无效时 */
+.popup-intro.error p { color: #a23; }
+
+/* ---------- 手机端：弹窗改为底部抽屉 ---------- */
+@media (max-width: 600px) {
+  .popup-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .popup {
+    max-width: none;
+    width: 100%;
+    max-height: 88dvh;
+    border-radius: 20px 20px 0 0;
+    /* 底部留出手势条/安全区 */
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: sheet-up 0.32s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  /* 顶部小手柄，提示可下滑关闭 */
+  .popup::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.18);
+    z-index: 6;
+  }
+  .popup-gallery { border-radius: 20px 20px 0 0; }
+  .popup-body { padding: 16px 18px 4px; }
+  .popup-title { font-size: 21px; }
+  .popup-view-map {
+    margin: 8px 16px calc(16px + env(safe-area-inset-bottom));
+    padding: 15px;
+  }
+  /* 关闭按钮加大，便于点按 */
+  .popup-close { width: 40px; height: 40px; font-size: 26px; }
+}
+
+/* ---------- 横屏手机：弹窗回到居中并限制高度 ---------- */
+@media (max-height: 480px) and (orientation: landscape) {
+  .popup-overlay { align-items: center; padding: 10px; }
+  .popup { max-width: 560px; max-height: 94dvh; flex-direction: column; }
+  .popup-gallery img { height: 140px; }
+}

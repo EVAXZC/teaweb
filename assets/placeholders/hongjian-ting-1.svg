@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7cae6e"/>
+      <stop offset="100%" stop-color="#cfe3b4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#g)"/>
+  <g fill="#ffffff" opacity="0.18">
+    <circle cx="120" cy="380" r="90"/>
+    <circle cx="260" cy="420" r="70"/>
+    <circle cx="650" cy="400" r="110"/>
+  </g>
+  <path d="M0 360 Q200 300 400 350 T800 330 V500 H0 Z" fill="#ffffff" opacity="0.12"/>
+  <text x="400" y="235" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="46" font-weight="700" fill="#ffffff" text-anchor="middle">鸿渐亭</text>
+  <text x="400" y="285" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="22" fill="#ffffff" opacity="0.85" text-anchor="middle">示例图片 1 · 待替换为实景照片</text>
+</svg>

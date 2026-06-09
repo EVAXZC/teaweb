@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>景点二维码生成 · 大同镇西乡茶园</title>
+  <style>
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      margin: 0;
+      background: #eef3e6;
+      color: #2c3a2e;
+    }
+    header {
+      background: #3f7050;
+      color: #fff;
+      padding: 18px 20px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 20px; }
+    header p { margin: 0; font-size: 13px; opacity: 0.9; }
+    .controls {
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .controls label { font-size: 14px; }
+    .controls input {
+      padding: 8px 10px;
+      border: 1px solid #b9cda8;
+      border-radius: 8px;
+      font-size: 14px;
+      min-width: 280px;
+    }
+    .controls button {
+      padding: 9px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #5a9367;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 8px 20px 40px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      break-inside: avoid;
+    }
+    .card h3 { margin: 0 0 4px; font-size: 16px; color: #3f7050; }
+    .card .url { font-size: 11px; color: #889; word-break: break-all; margin-bottom: 10px; }
+    .card .qr { display: flex; justify-content: center; }
+    .card .qr img, .card .qr canvas { width: 180px; height: 180px; }
+    @media print {
+      header, .controls { display: none; }
+      body { background: #fff; }
+      .grid { padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>景点二维码生成工具</h1>
+    <p>设置部署后的网站基础地址，即可为每个景点生成二维码，直接打印张贴在景点处。</p>
+  </header>
+
+  <div class="controls">
+    <label for="base">网站基础地址：</label>
+    <input id="base" type="text" placeholder="例如 https://your-domain.com/" />
+    <button id="gen">生成二维码</button>
+    <button id="print">打印 / 导出 PDF</button>
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <script src="vendor/qrcode.js"></script>
+  <script src="../js/spots.js"></script>
+  <script>
+    (function () {
+      var baseInput = document.getElementById("base");
+      var grid = document.getElementById("grid");
+
+      // 默认基础地址：取当前页面的上一级目录（qr/ 的父目录）
+      var guessed = window.location.href.replace(/qr\/[^/]*$/, "");
+      baseInput.value = guessed;
+
+      function makeUrl(base, id) {
+        if (!/\/$/.test(base)) base += "/";
+        return base + "index.html?spot=" + encodeURIComponent(id);
+      }
+
+      function render() {
+        var base = baseInput.value.trim() || guessed;
+        grid.innerHTML = "";
+        SPOTS.forEach(function (spot) {
+          var url = makeUrl(base, spot.id);
+
+          var card = document.createElement("div");
+          card.className = "card";
+
+          var h3 = document.createElement("h3");
+          h3.textContent = spot.name;
+
+          var urlEl = document.createElement("div");
+          urlEl.className = "url";
+          urlEl.textContent = url;
+
+          var qrBox = document.createElement("div");
+          qrBox.className = "qr";
+
+          // 使用 qrcode-generator（本地内置，离线可用）
+          var qr = qrcode(0, "M");
+          qr.addData(url);
+          qr.make();
+          qrBox.innerHTML = qr.createImgTag(6, 8);
+
+          card.appendChild(h3);
+          card.appendChild(qrBox);
+          card.appendChild(urlEl);
+          grid.appendChild(card);
+        });
+      }
+
+      document.getElementById("gen").addEventListener("click", render);
+      document.getElementById("print").addEventListener("click", function () { window.print(); });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

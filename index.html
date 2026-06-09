@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#3f7050" />
+  <title>大同镇西乡茶园 · 景区导览</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 全屏导览图 -->
+  <main id="map-stage" aria-label="景区导览图">
+    <div class="map-wrap">
+      <img id="map-image" src="map.jpg" alt="大同镇西乡茶园旅游导览图" />
+      <div id="hotspots" class="hotspots"></div>
+    </div>
+  </main>
+
+  <!-- 顶部提示 -->
+  <div id="hint" class="hint">点击地图上的圆点查看景点介绍 · 双指可缩放</div>
+
+  <!-- 景点弹窗 -->
+  <div id="popup-overlay" class="popup-overlay" hidden>
+    <div class="popup" role="dialog" aria-modal="true" aria-labelledby="popup-title">
+      <button id="popup-close" class="popup-close" aria-label="关闭">&times;</button>
+      <div class="popup-gallery" id="popup-gallery"></div>
+      <div class="popup-body">
+        <h1 id="popup-title" class="popup-title"></h1>
+        <div id="popup-intro" class="popup-intro"></div>
+      </div>
+      <button id="popup-view-map" class="popup-view-map">关闭并查看导览图</button>
+    </div>
+  </div>
+
+  <script src="js/spots.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

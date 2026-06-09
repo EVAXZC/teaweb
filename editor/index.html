@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>热点编辑器 · 大同镇西乡茶园</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; color: #2c3a2e; background: #eef3e6; }
+    .layout { display: flex; height: 100vh; }
+
+    /* 侧栏 */
+    .sidebar { width: 300px; flex: 0 0 300px; background: #fff; border-right: 1px solid #d8e3c9; display: flex; flex-direction: column; }
+    .sidebar header { padding: 14px 16px; background: #3f7050; color: #fff; }
+    .sidebar header h1 { margin: 0 0 4px; font-size: 17px; }
+    .sidebar header p { margin: 0; font-size: 12px; opacity: 0.9; line-height: 1.5; }
+    .actions { padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #eee; }
+    .actions button { padding: 8px 12px; border: none; border-radius: 8px; background: #5a9367; color: #fff; font-size: 13px; cursor: pointer; }
+    .actions button.secondary { background: #e7efdd; color: #3f7050; }
+    .list { flex: 1; overflow-y: auto; }
+    .item { display: flex; align-items: center; gap: 8px; padding: 9px 16px; cursor: pointer; border-bottom: 1px solid #f3f6ee; font-size: 14px; }
+    .item:hover { background: #f4f8ee; }
+    .item.active { background: #dceccf; font-weight: 600; }
+    .item .badge { width: 9px; height: 9px; border-radius: 50%; background: #5a9367; flex: 0 0 9px; }
+    .item .badge.unset { background: #d9534f; }
+    .item .xy { margin-left: auto; font-size: 11px; color: #889; }
+
+    /* 地图区 */
+    .stage { flex: 1; overflow: auto; background: #e7efdd; position: relative; }
+    .map-wrap { position: relative; width: 100%; max-width: 1600px; margin: auto; line-height: 0; }
+    .map-wrap img { display: block; width: 100%; height: auto; }
+    .markers { position: absolute; inset: 0; }
+    .marker {
+      position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+      border-radius: 50%; background: rgba(90,147,103,0.85); border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35); cursor: grab; touch-action: none;
+    }
+    .marker.active { background: #d9534f; transform: scale(1.15); z-index: 3; }
+    .marker .tip {
+      position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+      white-space: nowrap; background: rgba(0,0,0,0.72); color: #fff; font-size: 11px;
+      padding: 2px 6px; border-radius: 5px; line-height: 1.4; opacity: 0; transition: opacity .15s; pointer-events: none;
+    }
+    .marker:hover .tip, .marker.active .tip { opacity: 1; }
+    .hint-bar { position: sticky; top: 0; z-index: 5; background: rgba(63,112,80,0.95); color: #fff; font-size: 12px; padding: 6px 12px; }
+
+    /* 窄屏：侧栏移到顶部，地图在下方 */
+    @media (max-width: 720px) {
+      .layout { flex-direction: column; height: auto; min-height: 100vh; }
+      .sidebar { width: 100%; flex: none; border-right: none; border-bottom: 1px solid #d8e3c9; }
+      .list { max-height: 38vh; }
+      .stage { min-height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <header>
+        <h1>景点热点编辑器</h1>
+        <p>① 选中左侧景点 → ② 在地图上点击它的位置（或直接拖动地图上的圆点）→ ③ 完成后下载 spots.js 覆盖原文件。</p>
+      </header>
+      <div class="actions">
+        <button id="download">下载 spots.js</button>
+        <button id="copy" class="secondary">复制坐标 JSON</button>
+        <button id="reset" class="secondary">恢复初始</button>
+      </div>
+      <div id="list" class="list"></div>
+    </aside>
+
+    <main class="stage">
+      <div class="hint-bar" id="hintbar">提示：选中一个景点后，点击地图设定其位置；圆点可直接拖动微调。</div>
+      <div class="map-wrap">
+        <img id="map" src="../map.jpg" alt="导览图" />
+        <div id="markers" class="markers"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/spots.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    // 深拷贝一份可编辑数据；保留原始用于「恢复初始」
+    var ORIGINAL = JSON.parse(JSON.stringify(SPOTS));
+    var data = JSON.parse(JSON.stringify(SPOTS));
+    var activeId = data.length ? data[0].id : null;
+
+    var listEl = document.getElementById("list");
+    var markersEl = document.getElementById("markers");
+    var wrap = document.querySelector(".map-wrap");
+    var hintbar = document.getElementById("hintbar");
+
+    function spotById(id) { return data.filter(function (s) { return s.id === id; })[0]; }
+
+    function renderList() {
+      listEl.innerHTML = "";
+      data.forEach(function (s) {
+        var row = document.createElement("div");
+        row.className = "item" + (s.id === activeId ? " active" : "");
+        var badge = document.createElement("span");
+        badge.className = "badge" + (s.coords ? "" : " unset");
+        var name = document.createElement("span");
+        name.textContent = s.name;
+        var xy = document.createElement("span");
+        xy.className = "xy";
+        xy.textContent = s.coords ? (s.coords.x.toFixed(1) + ", " + s.coords.y.toFixed(1)) : "未定位";
+        row.appendChild(badge); row.appendChild(name); row.appendChild(xy);
+        row.addEventListener("click", function () { activeId = s.id; render(); });
+        listEl.appendChild(row);
+      });
+    }
+
+    function renderMarkers() {
+      markersEl.innerHTML = "";
+      data.forEach(function (s) {
+        if (!s.coords) return;
+        var m = document.createElement("div");
+        m.className = "marker" + (s.id === activeId ? " active" : "");
+        m.style.left = s.coords.x + "%";
+        m.style.top = s.coords.y + "%";
+        var tip = document.createElement("span");
+        tip.className = "tip"; tip.textContent = s.name;
+        m.appendChild(tip);
+        m.addEventListener("mousedown", function (e) { startDrag(e, s); });
+        m.addEventListener("touchstart", function (e) { startDrag(e, s); }, { passive: false });
+        markersEl.appendChild(m);
+      });
+    }
+
+    function render() { renderList(); renderMarkers(); }
+
+    // 坐标换算：事件坐标 → 相对图片的百分比
+    function toPercent(clientX, clientY) {
+      var r = wrap.getBoundingClientRect();
+      var x = (clientX - r.left) / r.width * 100;
+      var y = (clientY - r.top) / r.height * 100;
+      return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+    }
+
+    // 点击地图：给当前选中景点设定坐标
+    wrap.addEventListener("click", function (e) {
+      if (dragging) return;            // 拖动结束的 click 不处理
+      if (e.target.closest(".marker")) return;
+      if (!activeId) { flash("请先在左侧选中一个景点"); return; }
+      var p = toPercent(e.clientX, e.clientY);
+      spotById(activeId).coords = { x: round(p.x), y: round(p.y) };
+      render();
+    });
+
+    // 拖动标记
+    var dragging = null;
+    function startDrag(e, s) {
+      e.preventDefault();
+      activeId = s.id;
+      dragging = s;
+      render();
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", endDrag);
+      document.addEventListener("touchmove", onMove, { passive: false });
+      document.addEventListener("touchend", endDrag);
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      var pt = e.touches ? e.touches[0] : e;
+      var p = toPercent(pt.clientX, pt.clientY);
+      dragging.coords = { x: round(p.x), y: round(p.y) };
+      renderMarkers(); renderList();
+    }
+    function endDrag() {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", endDrag);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", endDrag);
+      // 延迟清空，避免误触发 wrap 的 click
+      setTimeout(function () { dragging = null; }, 0);
+    }
+
+    function round(n) { return Math.round(n * 10) / 10; }
+
+    function flash(msg) {
+      hintbar.textContent = msg;
+      setTimeout(function () {
+        hintbar.textContent = "提示：选中一个景点后，点击地图设定其位置；圆点可直接拖动微调。";
+      }, 2000);
+    }
+
+    // 生成完整 spots.js 文本
+    function buildSpotsFile() {
+      var header =
+        "/*\n" +
+        " * 景点数据 —— 大同镇西乡茶园\n" +
+        " * 由 editor/index.html 生成。intro / images 为占位内容，可替换为真实文案与照片。\n" +
+        " *   - coords：景点在导览图上的位置（相对图片宽/高的百分比 0-100）。\n" +
+        " * 二维码指向 index.html?spot=<id>，因此 id 不要随意更改。\n" +
+        " */\n";
+      return header + "const SPOTS = " + JSON.stringify(data, null, 2) + ";\n\n" +
+        "if (typeof window !== \"undefined\") {\n  window.SPOTS = SPOTS;\n}\n";
+    }
+
+    document.getElementById("download").addEventListener("click", function () {
+      var blob = new Blob([buildSpotsFile()], { type: "text/javascript;charset=utf-8" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "spots.js";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      flash("已下载 spots.js，请覆盖项目里的 js/spots.js");
+    });
+
+    document.getElementById("copy").addEventListener("click", function () {
+      var map = {};
+      data.forEach(function (s) { if (s.coords) map[s.id] = s.coords; });
+      var text = JSON.stringify(map, null, 2);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function () { flash("坐标 JSON 已复制到剪贴板"); });
+      } else {
+        window.prompt("复制以下坐标：", text);
+      }
+    });
+
+    document.getElementById("reset").addEventListener("click", function () {
+      if (!window.confirm("确定恢复到初始坐标？未下载的修改会丢失。")) return;
+      data = JSON.parse(JSON.stringify(ORIGINAL));
+      render();
+    });
+
+    render();
+  })();
+  </script>
+</body>
+</html>
