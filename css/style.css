@@ -17,23 +17,24 @@ html, body {
   -webkit-text-size-adjust: 100%;
 }
 
-/* ---------- 导览图 ---------- */
+/* ---------- 导览图（自定义缩放/拖动） ---------- */
 #map-stage {
   position: fixed;
   inset: 0;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   background: #e7efdd;
+  touch-action: none;          /* 自行处理手势，禁用浏览器默认缩放/滚动 */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.map-wrap {
-  position: relative;
+#map-pan {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 1400px;
-  margin: auto;
+  transform-origin: 0 0;
+  will-change: transform;
   line-height: 0;
 }
 
@@ -41,29 +42,33 @@ html, body {
   display: block;
   width: 100%;
   height: auto;
-  user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;        /* 图片本身不拦截手势 */
 }
 
 /* ---------- 地图热点 ---------- */
 .hotspots {
   position: absolute;
   inset: 0;
-  pointer-events: none; /* 仅标记本身可点击 */
+  pointer-events: none;        /* 仅标记本身可点击 */
+  --inv: 1;                    /* = 1/缩放倍数，使圆点保持恒定屏幕大小 */
 }
 
 .hotspot {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px; /* 以坐标为圆心 */
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: rgba(90, 147, 103, 0.85);
+  background: rgba(90, 147, 103, 0.9);
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   pointer-events: auto;
+  padding: 0;
   -webkit-tap-highlight-color: transparent;
+  /* 以坐标为圆心，并按地图缩放反向缩放，保持恒定屏幕尺寸 */
+  transform: translate(-50%, -50%) scale(var(--inv));
+  transform-origin: center;
 }
 /* 脉冲提示环 */
 .hotspot::after {
@@ -79,10 +84,6 @@ html, body {
 @keyframes pulse {
   0%   { transform: scale(0.6); opacity: 0.9; }
   100% { transform: scale(1.6); opacity: 0; }
-}
-
-@media (max-width: 600px) {
-  .hotspot { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
 }
 
 .hint {
