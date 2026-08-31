@@ -16,8 +16,8 @@ const SPOTS = [
       "assets/placeholders/youke-zhongxin-2.svg"
     ],
     "coords": {
-      "x": 41.8,
-      "y": 45.3
+      "x": 42.9,
+      "y": 46.3
     }
   },
   {
@@ -31,8 +31,8 @@ const SPOTS = [
       "assets/placeholders/baocha-zhongxin-2.svg"
     ],
     "coords": {
-      "x": 42.6,
-      "y": 47.1
+      "x": 42.3,
+      "y": 47.3
     }
   },
   {
@@ -47,7 +47,7 @@ const SPOTS = [
     ],
     "coords": {
       "x": 38.1,
-      "y": 63.3
+      "y": 62.7
     }
   },
   {
@@ -106,8 +106,8 @@ const SPOTS = [
       "assets/placeholders/taotian-lin-2.svg"
     ],
     "coords": {
-      "x": 41.7,
-      "y": 59
+      "x": 42.1,
+      "y": 59.2
     }
   },
   {
@@ -235,8 +235,8 @@ const SPOTS = [
     ],
     "images": [],
     "coords": {
-      "x": 41.5,
-      "y": 60.1
+      "x": 41.6,
+      "y": 60
     }
   },
   {
@@ -322,7 +322,7 @@ const SPOTS = [
       "assets/placeholders/chunshui-chapu-2.svg"
     ],
     "coords": {
-      "x": 42,
+      "x": 42.4,
       "y": 60.6
     }
   },
@@ -349,8 +349,8 @@ const SPOTS = [
     ],
     "images": [],
     "coords": {
-      "x": 31.7,
-      "y": 72.2
+      "x": 31.4,
+      "y": 72.4
     }
   },
   {
