@@ -242,15 +242,34 @@
       apply();
     }
 
-    function reset(animate) {
+    function isMobileView() {
+      return window.matchMedia("(max-width: 600px)").matches;
+    }
+
+    function setView(animate, nextScale, focusX, focusY) {
       if (!mapW) measure();
       if (animate) pan.style.transition = "transform 0.3s ease";
       else pan.style.transition = "none";
-      s = fitScale;
-      tx = (stageW - mapW * s) / 2;
-      ty = (stageH - mapH * s) / 2;
+      s = Math.max(fitScale, Math.min(MAX, nextScale));
+      tx = stageW / 2 - mapW * focusX * s;
+      ty = stageH / 2 - mapH * focusY * s;
       apply();
       if (animate) setTimeout(function () { pan.style.transition = "none"; }, 320);
+    }
+
+    function reset(animate) {
+      setView(animate, fitScale, 0.5, 0.5);
+    }
+
+    function resetToStart(animate) {
+      if (!mapW) measure();
+      if (!isMobileView()) {
+        reset(animate);
+        return;
+      }
+      // 手机默认聚焦左侧茶园主体；用户仍可双指缩小到整张导览图。
+      var mobileScale = Math.max(fitScale, stageH / (mapH * 0.82));
+      setView(animate, mobileScale, 0.37, 0.56);
     }
 
     // ---- 指针手势（鼠标 + 触摸统一） ----
@@ -336,7 +355,7 @@
     stage.addEventListener("dblclick", function (e) {
       var p = localPoint(e.clientX, e.clientY);
       pan.style.transition = "transform 0.25s ease";
-      if (s > fitScale * 1.2) reset(true);
+      if (s > fitScale * 1.2) resetToStart(true);
       else setScaleAround(fitScale * 2.6, p.x, p.y);
       setTimeout(function () { pan.style.transition = "none"; }, 260);
     });
@@ -345,15 +364,16 @@
     var rt = null;
     window.addEventListener("resize", function () {
       if (rt) clearTimeout(rt);
-      rt = setTimeout(function () { measure(); reset(false); }, 150);
+      rt = setTimeout(function () { measure(); resetToStart(false); }, 150);
     });
 
-    function init() { measure(); reset(false); }
+    function init() { measure(); resetToStart(false); }
     if (mapImg.complete && mapImg.naturalWidth) init();
     else mapImg.addEventListener("load", init);
 
     return {
       reset: reset,
+      resetToStart: resetToStart,
       didDrag: function () { return dragged; }
     };
   })();
@@ -384,7 +404,7 @@
   }
 
   function openPopup() {
-    mapZoom.reset(false);         // 复位地图缩放，弹窗以正常尺寸显示
+    mapZoom.resetToStart(false);
     overlay.hidden = false;
     document.body.style.overflow = "hidden";
     popup.style.transform = "";   // 清除上次下滑遗留的位移
@@ -397,6 +417,7 @@
     document.body.style.overflow = "";
     popup.style.transition = "";
     popup.style.transform = "";
+    mapZoom.resetToStart(false);
     autoFadeHint();
     // 关闭后从地址栏移除 spot 参数，刷新/分享时直接看到地图
     if (window.history && window.history.replaceState) {

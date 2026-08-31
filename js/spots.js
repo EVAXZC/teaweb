@@ -106,8 +106,8 @@ const SPOTS = [
       "assets/placeholders/taotian-lin-2.svg"
     ],
     "coords": {
-      "x": 43.9,
-      "y": 58.9
+      "x": 41.7,
+      "y": 59
     }
   },
   {
@@ -122,7 +122,7 @@ const SPOTS = [
     ],
     "coords": {
       "x": 41.2,
-      "y": 67
+      "y": 66.6
     }
   },
   {
@@ -136,8 +136,8 @@ const SPOTS = [
       "assets/placeholders/guixiang-lin-2.svg"
     ],
     "coords": {
-      "x": 43.3,
-      "y": 62.6
+      "x": 43.6,
+      "y": 62.4
     }
   },
   {
@@ -151,8 +151,8 @@ const SPOTS = [
       "assets/placeholders/chaye-yingdi-2.svg"
     ],
     "coords": {
-      "x": 34.4,
-      "y": 60.5
+      "x": 34.5,
+      "y": 60.1
     }
   },
   {
@@ -166,8 +166,8 @@ const SPOTS = [
       "assets/placeholders/chaqi-leyuan-2.svg"
     ],
     "coords": {
-      "x": 35.4,
-      "y": 61.3
+      "x": 35.7,
+      "y": 61.5
     }
   },
   {
@@ -181,8 +181,8 @@ const SPOTS = [
       "assets/placeholders/jingling-matou-2.svg"
     ],
     "coords": {
-      "x": 36.8,
-      "y": 61.3
+      "x": 36.5,
+      "y": 61
     }
   },
   {
@@ -235,8 +235,8 @@ const SPOTS = [
     ],
     "images": [],
     "coords": {
-      "x": 41.2,
-      "y": 60.7
+      "x": 41.5,
+      "y": 60.1
     }
   },
   {
@@ -277,8 +277,8 @@ const SPOTS = [
       "assets/placeholders/dongpo-ting-2.svg"
     ],
     "coords": {
-      "x": 33.6,
-      "y": 65.3
+      "x": 33.8,
+      "y": 65
     }
   },
   {
@@ -322,8 +322,8 @@ const SPOTS = [
       "assets/placeholders/chunshui-chapu-2.svg"
     ],
     "coords": {
-      "x": 42.4,
-      "y": 61.4
+      "x": 42,
+      "y": 60.6
     }
   },
   {
