@@ -12,7 +12,6 @@
   var titleEl = document.getElementById("popup-title");
   var introEl = document.getElementById("popup-intro");
   var closeBtn = document.getElementById("popup-close");
-  var viewMapBtn = document.getElementById("popup-view-map");
   var speakBtn = document.getElementById("popup-speak");
   var hint = document.getElementById("hint");
   var hotspotsEl = document.getElementById("hotspots");
@@ -484,7 +483,6 @@
     window.speechSynthesis.onvoiceschanged = pickChineseVoice;
   }
   closeBtn.addEventListener("click", closePopup);
-  viewMapBtn.addEventListener("click", closePopup);
   if (speakBtn) speakBtn.addEventListener("click", speakCurrentSpot);
   overlay.addEventListener("click", function (e) {
     if (e.target === overlay) closePopup();
