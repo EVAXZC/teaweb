@@ -13,6 +13,7 @@
   var introEl = document.getElementById("popup-intro");
   var closeBtn = document.getElementById("popup-close");
   var viewMapBtn = document.getElementById("popup-view-map");
+  var speakBtn = document.getElementById("popup-speak");
   var hint = document.getElementById("hint");
   var hotspotsEl = document.getElementById("hotspots");
   var popup = overlay.querySelector(".popup");
@@ -20,6 +21,25 @@
   var stage = document.getElementById("map-stage");
   var pan = document.getElementById("map-pan");
   var mapImg = document.getElementById("map-image");
+  var canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  var currentSpeechText = "";
+  var currentUtterance = null;
+  var speechActive = false;
+  var preferredVoice = null;
+  var preferredMandarinVoices = [
+    "Siri",
+    "Microsoft Xiaoxiao Online",
+    "Microsoft Xiaoxiao",
+    "Xiaoxiao",
+    "Microsoft Yunxi Online",
+    "Microsoft Yunxi",
+    "Yunxi",
+    "Microsoft Xiaoyi Online",
+    "Microsoft Xiaoyi",
+    "Xiaoyi",
+    "Ting-Ting",
+    "Tingting"
+  ];
 
   function getSpotId() {
     var params = new URLSearchParams(window.location.search);
@@ -35,6 +55,8 @@
   }
 
   function renderPopup(spot) {
+    stopSpeech();
+
     // 图片
     gallery.innerHTML = "";
     (spot.images || []).forEach(function (src) {
@@ -56,9 +78,12 @@
       p.textContent = text;
       introEl.appendChild(p);
     });
+    currentSpeechText = buildSpeechText(spot.name, paras);
+    updateSpeakButton(false);
   }
 
   function renderUnknown(id) {
+    stopSpeech();
     gallery.style.display = "none";
     titleEl.textContent = "未找到该景点";
     introEl.className = "popup-intro error";
@@ -66,6 +91,103 @@
     var p = document.createElement("p");
     p.textContent = '抱歉，没有找到编号为 "' + id + '" 的景点。请关闭后查看导览图，或重新扫码。';
     introEl.appendChild(p);
+    currentSpeechText = "";
+    updateSpeakButton(false);
+  }
+
+  function buildSpeechText(name, paras) {
+    var parts = [name].concat(paras.filter(Boolean));
+    return parts.join("。")
+      .replace(/[“”]/g, "")
+      .replace(/[·]/g, "")
+      .replace(/[；;]+/g, "，")
+      .replace(/[。！？!?]+/g, "。")
+      .replace(/\s+/g, "")
+      .replace(/。+/g, "。");
+  }
+
+  function scoreVoice(voice) {
+    var lang = (voice.lang || "").replace("_", "-").toLowerCase();
+    var name = (voice.name || "").toLowerCase();
+    var score = 0;
+    preferredMandarinVoices.forEach(function (preferredName, index) {
+      if (name.indexOf(preferredName.toLowerCase()) !== -1) score += 120 - index * 6;
+    });
+    if (lang === "zh-cn" || lang === "cmn-cn" || lang === "zh-hans-cn") score += 80;
+    else if (lang.indexOf("zh") === 0 || lang.indexOf("cmn") === 0) score += 45;
+    if (/xiaoxiao|xiaoyi|xiaobei|xiaoni|yunxi|yunjian|ting-ting|tingting|mei-jia|meijia|siri/i.test(name)) score += 30;
+    if (/premium|enhanced|natural|neural|online/i.test(name)) score += 20;
+    if (/hong|cantonese|yue|taiwan|hk|tw/i.test(name + " " + lang)) score -= 25;
+    if (voice.localService) score += 4;
+    return score;
+  }
+
+  function pickChineseVoice() {
+    if (!canSpeak) return null;
+    var voices = window.speechSynthesis.getVoices();
+    var best = null;
+    var bestScore = -Infinity;
+    for (var i = 0; i < voices.length; i++) {
+      var score = scoreVoice(voices[i]);
+      if (score > bestScore) {
+        best = voices[i];
+        bestScore = score;
+      }
+    }
+    preferredVoice = bestScore > 0 ? best : null;
+    return preferredVoice;
+  }
+
+  function updateSpeakButton(isSpeaking) {
+    if (!speakBtn) return;
+    speakBtn.disabled = !canSpeak || !currentSpeechText;
+    speakBtn.textContent = isSpeaking ? "停止" : "朗读";
+    speakBtn.classList.toggle("is-speaking", !!isSpeaking);
+    speakBtn.setAttribute("aria-pressed", isSpeaking ? "true" : "false");
+    speakBtn.setAttribute("aria-label", isSpeaking ? "停止朗读景点介绍" : "朗读景点介绍");
+  }
+
+  function stopSpeech() {
+    if (!canSpeak) return;
+    speechActive = false;
+    currentUtterance = null;
+    window.speechSynthesis.cancel();
+    updateSpeakButton(false);
+  }
+
+  function speakCurrentSpot() {
+    if (!canSpeak || !currentSpeechText) return;
+    if (speechActive) {
+      stopSpeech();
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    var utterance = new SpeechSynthesisUtterance(currentSpeechText);
+    utterance.lang = "zh-CN";
+    utterance.rate = 1.22;
+    utterance.pitch = 1.03;
+    utterance.volume = 1;
+    utterance.voice = preferredVoice || pickChineseVoice();
+    currentUtterance = utterance;
+    speechActive = true;
+    updateSpeakButton(true);
+
+    utterance.onstart = function () {
+      if (currentUtterance === utterance) {
+        speechActive = true;
+        updateSpeakButton(true);
+      }
+    };
+    utterance.onend = function () {
+      if (currentUtterance === utterance) {
+        speechActive = false;
+        currentUtterance = null;
+        updateSpeakButton(false);
+      }
+    };
+    utterance.onerror = utterance.onend;
+    window.speechSynthesis.speak(utterance);
   }
 
   /* ---------------- 地图自定义缩放 / 拖动 ----------------
@@ -76,7 +198,7 @@
   var mapZoom = (function () {
     var s = 1, tx = 0, ty = 0;
     var mapW = 0, mapH = 0, stageW = 0, stageH = 0, fitScale = 1;
-    var MAX = 6;
+    var MAX = 1.6;
     var dragged = false, dragFlagTimer = null;
 
     function localPoint(clientX, clientY) {
@@ -89,8 +211,11 @@
       stageH = stage.clientHeight;
       var prev = pan.style.transform;
       pan.style.transform = "none";
-      mapW = pan.offsetWidth;          // = 舞台宽度（width:100%）
-      mapH = pan.offsetHeight;         // = 图片等比高度
+      if (mapImg.naturalWidth) {
+        pan.style.width = mapImg.naturalWidth + "px";
+      }
+      mapW = pan.offsetWidth;          // 使用原图像素宽度，放大时文字更清晰
+      mapH = pan.offsetHeight;         // 图片等比高度
       pan.style.transform = prev;
       // 适配整图可见：宽或高任一受限
       fitScale = Math.min(stageW / mapW, stageH / mapH) || 1;
@@ -267,6 +392,7 @@
   }
 
   function closePopup() {
+    stopSpeech();
     overlay.hidden = true;
     document.body.style.overflow = "";
     popup.style.transition = "";
@@ -332,8 +458,13 @@
   }
 
   // 事件绑定
+  if (canSpeak) {
+    pickChineseVoice();
+    window.speechSynthesis.onvoiceschanged = pickChineseVoice;
+  }
   closeBtn.addEventListener("click", closePopup);
   viewMapBtn.addEventListener("click", closePopup);
+  if (speakBtn) speakBtn.addEventListener("click", speakCurrentSpot);
   overlay.addEventListener("click", function (e) {
     if (e.target === overlay) closePopup();
   });
