@@ -1,6 +1,7 @@
 /*
  * 景点数据 —— 西乡茶园旅游度假区
  * 由 editor/index.html 生成。intro / images 为占位内容，可替换为真实文案与照片。
+ *   - audio：景点朗读音频文件。
  *   - coords：景点在导览图上的位置（相对图片宽/高的百分比 0-100）。
  * 二维码指向 index.html?spot=<id>，因此 id 不要随意更改。
  */
@@ -18,7 +19,8 @@ const SPOTS = [
     "coords": {
       "x": 42.9,
       "y": 46.3
-    }
+    },
+    "audio": "assets/音频/游客中心.mp3"
   },
   {
     "id": "baocha-zhongxin",
@@ -33,7 +35,8 @@ const SPOTS = [
     "coords": {
       "x": 42.3,
       "y": 47.3
-    }
+    },
+    "audio": "assets/音频/苞茶中心.mp3"
   },
   {
     "id": "foshou-hu",
@@ -48,7 +51,8 @@ const SPOTS = [
     "coords": {
       "x": 38.1,
       "y": 62.7
-    }
+    },
+    "audio": "assets/音频/佛手湖.mp3"
   },
   {
     "id": "caihong-tianti",
@@ -63,7 +67,8 @@ const SPOTS = [
     "coords": {
       "x": 34.8,
       "y": 56.8
-    }
+    },
+    "audio": "assets/音频/彩虹天梯.mp3"
   },
   {
     "id": "shiguang-shuba",
@@ -78,7 +83,8 @@ const SPOTS = [
     "coords": {
       "x": 36.2,
       "y": 56
-    }
+    },
+    "audio": "assets/音频/茶野书吧·观景台.mp3"
   },
   {
     "id": "yunqi-chaba",
@@ -93,7 +99,8 @@ const SPOTS = [
     "coords": {
       "x": 41.4,
       "y": 57.4
-    }
+    },
+    "audio": "assets/音频/云栖茶坝.mp3"
   },
   {
     "id": "taotian-lin",
@@ -108,7 +115,8 @@ const SPOTS = [
     "coords": {
       "x": 42.1,
       "y": 59.2
-    }
+    },
+    "audio": "assets/音频/桃夭林.mp3"
   },
   {
     "id": "yingxue-lin",
@@ -123,7 +131,8 @@ const SPOTS = [
     "coords": {
       "x": 41.2,
       "y": 66.6
-    }
+    },
+    "audio": "assets/音频/樱雪林.mp3"
   },
   {
     "id": "guixiang-lin",
@@ -138,7 +147,8 @@ const SPOTS = [
     "coords": {
       "x": 43.6,
       "y": 62.4
-    }
+    },
+    "audio": "assets/音频/桂香林.mp3"
   },
   {
     "id": "chaye-yingdi",
@@ -153,7 +163,8 @@ const SPOTS = [
     "coords": {
       "x": 34.5,
       "y": 60.1
-    }
+    },
+    "audio": "assets/音频/茶园星空营地.mp3"
   },
   {
     "id": "chaqi-leyuan",
@@ -168,7 +179,8 @@ const SPOTS = [
     "coords": {
       "x": 35.7,
       "y": 61.5
-    }
+    },
+    "audio": "assets/音频/茶憨憨水乐园.mp3"
   },
   {
     "id": "jingling-matou",
@@ -183,7 +195,8 @@ const SPOTS = [
     "coords": {
       "x": 36.5,
       "y": 61
-    }
+    },
+    "audio": "assets/音频/精灵湾码头.mp3"
   },
   {
     "id": "chaxiangu-suxi",
@@ -198,7 +211,8 @@ const SPOTS = [
     "coords": {
       "x": 25.6,
       "y": 69.9
-    }
+    },
+    "audio": "assets/音频/茶仙谷溯溪.mp3"
   },
   {
     "id": "chaxiangu-matou",
@@ -206,11 +220,15 @@ const SPOTS = [
     "intro": [
       "从这里登陆茶仙谷溯溪，开启一段欢乐之旅。"
     ],
-    "images": [],
+    "images": [
+      "assets/placeholders/chaxiangu-matou-1.svg",
+      "assets/placeholders/chaxiangu-matou-2.svg"
+    ],
     "coords": {
       "x": 29.4,
       "y": 67.6
-    }
+    },
+    "audio": "assets/音频/茶仙谷码头.mp3"
   },
   {
     "id": "moyu-diaotai",
@@ -225,7 +243,8 @@ const SPOTS = [
     "coords": {
       "x": 31.9,
       "y": 75.5
-    }
+    },
+    "audio": "assets/音频/摸鱼钓台.mp3"
   },
   {
     "id": "zhuoxia-diaotai",
@@ -233,11 +252,15 @@ const SPOTS = [
     "intro": [
       "在此垂钓，可享山水之幽，得闲静之趣。"
     ],
-    "images": [],
+    "images": [
+      "assets/placeholders/zhuoxia-diaotai-1.svg",
+      "assets/placeholders/zhuoxia-diaotai-2.svg"
+    ],
     "coords": {
       "x": 41.6,
       "y": 60
-    }
+    },
+    "audio": "assets/音频/捉虾钓台.mp3"
   },
   {
     "id": "huobite-leyuan",
@@ -245,11 +268,15 @@ const SPOTS = [
     "intro": [
       "充满童话感与亲子趣味的游玩空间。仿佛走进一个藏在茶山里的奇幻小村落，在这里玩耍探索，感受纯真的童话世界。"
     ],
-    "images": [],
+    "images": [
+      "assets/placeholders/huobite-leyuan-1.svg",
+      "assets/placeholders/huobite-leyuan-2.svg"
+    ],
     "coords": {
       "x": 29.2,
       "y": 76.6
-    }
+    },
+    "audio": "assets/音频/霍比特乐园.mp3"
   },
   {
     "id": "hongjian-ting",
@@ -264,7 +291,8 @@ const SPOTS = [
     "coords": {
       "x": 39.8,
       "y": 59.3
-    }
+    },
+    "audio": "assets/音频/鸿渐亭.mp3"
   },
   {
     "id": "dongpo-ting",
@@ -279,7 +307,8 @@ const SPOTS = [
     "coords": {
       "x": 33.8,
       "y": 65
-    }
+    },
+    "audio": "assets/音频/东坡亭.mp3"
   },
   {
     "id": "yuchuan-ting",
@@ -294,7 +323,8 @@ const SPOTS = [
     "coords": {
       "x": 34.3,
       "y": 70
-    }
+    },
+    "audio": "assets/音频/玉川亭.mp3"
   },
   {
     "id": "muyun-guanjingtai",
@@ -309,7 +339,8 @@ const SPOTS = [
     "coords": {
       "x": 41.9,
       "y": 70.5
-    }
+    },
+    "audio": "assets/音频/暮云揽山·观景台.mp3"
   },
   {
     "id": "chunshui-chapu",
@@ -324,7 +355,8 @@ const SPOTS = [
     "coords": {
       "x": 42.4,
       "y": 60.6
-    }
+    },
+    "audio": "assets/音频/春水茶铺.mp3"
   },
   {
     "id": "chaye-keting",
@@ -339,7 +371,8 @@ const SPOTS = [
     "coords": {
       "x": 39.9,
       "y": 63.9
-    }
+    },
+    "audio": "assets/音频/茶野会客厅.mp3"
   },
   {
     "id": "yisuoyanyu-budao",
@@ -347,11 +380,15 @@ const SPOTS = [
     "intro": [
       "取意于苏轼名句“一蓑烟雨任平生”，带有一种从容、洒脱、自在前行的意境，像是一段把诗意、茶香与生活节奏连接起来的慢行旅程。来到一蓑烟雨步道，走过的是湖边小径，留下的是一份从容自在的记忆。"
     ],
-    "images": [],
+    "images": [
+      "assets/placeholders/yisuoyanyu-budao-1.svg",
+      "assets/placeholders/yisuoyanyu-budao-2.svg"
+    ],
     "coords": {
       "x": 31.4,
       "y": 72.4
-    }
+    },
+    "audio": "assets/音频/一蓑烟雨步道.mp3"
   },
   {
     "id": "yinxiao-xuxing-lvdao",
@@ -359,11 +396,15 @@ const SPOTS = [
     "intro": [
       "取意于苏轼《定风波》中的“何妨吟啸且徐行”，表达的是一种不急不躁、从容前行的人生态度。沿着吟啸徐行绿道慢慢穿行在茶山、林木与水岸之间，感受山风拂面、茶香相伴的清新与自在。"
     ],
-    "images": [],
+    "images": [
+      "assets/placeholders/yinxiao-xuxing-lvdao-1.svg",
+      "assets/placeholders/yinxiao-xuxing-lvdao-2.svg"
+    ],
     "coords": {
       "x": 35.6,
       "y": 70
-    }
+    },
+    "audio": "assets/音频/吟啸徐行绿道.mp3"
   }
 ];
 
